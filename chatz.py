@@ -7,10 +7,13 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mysecret'
 socketio = SocketIO(app)
 
-@socketio.on('message')
-def handleMessage(msg):
-	print('Message: ' + msg)
-	send(msg, broadcast=True)
+def messageRecived():
+  print( 'message was received!!!' )
+
+@socketio.on('my event')
+def handleMessage( json ):
+	print('Message: ' + str(json))
+	socketio.emit('my response', json)
 
 @app.route("/")
 def get_news():

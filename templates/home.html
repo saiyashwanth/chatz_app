@@ -2,34 +2,85 @@
 	<head>
 		<title>Chat Room</title>
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity=" sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+		
 	</head>
 	<body>
+
+		<div class="well">
+			<h1 class="tect-center">My Chat App</h1>	
+		</div>
+		
+
+		<div class="container">
+			<div class="row">
+				<div class="col-md-8">
+					<h3>No Message yet</h3>
+					<div class="msg-Holder"></div>
+				</div>
+				<div class="col-md-4">
+						<form action="" method="POST">
+							<b style="font-size: 20px;">Type Your Message Below</b><hr>
+								<div class="form-group">
+								    <label for="exampleInputEmail1">User Name</label>
+								    <input type="text" class="username form-control" id="exampleInputEmail1" placeholder="User Name">
+								</div>
+								<div class="form-group">
+								    <label for="exampleInputPassword1">Message</label>
+								    <input type="text" class="message form-control" id="exampleInputPassword1" placeholder="Your Message">
+								</div>
+								<button  type="submit" class="btn btn-success">Send</button>
+						</form>	
+				</div>
+			</div>
+		</div>
+
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js" ></script>
+
 		<script type="text/javascript">
+			
+			var socket = io.connect( 'http://127.0.0.1:5000/')
 
-			$(document).ready(function() {
-				var socket = io.connect('http://127.0.0.1:5000');
-				socket.on('connect', function() {
-				socket.send('User has connected!');
+			socket.on('my event', function() {
+				socket.emit('my event', {
+					data : 'User Connected'
+				})
+			})
+
+
+			var form = $('form').on('submit', function( e ) {
+				e.preventDefault()
+
+				var user_name = $('input.username').val()
+				var message  = $('input.message').val()
+
+				socket.emit('my event', {
+					user : user_name,
+					msg : message
+				})
+				$('input.message').val('').focus()
 			});
 
-			socket.on('message', function(msg) {
-				$("#messages").append('<p>'+msg+'</p>');
-				console.log('Received message');
-			});
+			socket.on('my response' , function( msg ) {
+				if(typeof msg.user !== 'undefined'){
+					$('h3').remove()
+					$('div.msg-Holder').append('<div class="msgbbl"><b> '+msg.user+'</b>: '+msg.msg+'</div>')
+				}
+				console.log( msg )
+			})
+			
 
-			$('#sendbutton').on('click', function() {
-				socket.send($('#myMessage').val());
-				$('#myMessage').val('');
-			});
+			
 
-		});
+
 		</script>
 
 
-		<ul id="messages"></ul>
-		<input type="text" id="myMessage">
-		<button id="sendbutton"> Send </button>
+
+
+
+
+		
 	</body>
-</html>>
+</html>
